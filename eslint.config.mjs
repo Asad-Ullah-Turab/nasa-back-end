@@ -2,9 +2,18 @@ import { defineConfig } from "eslint/config";
 import js from "@eslint/js";
 import globals from "globals";
 
-
 export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"] },
-  { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
-  { files: ["**/*.{js,mjs,cjs}"], languageOptions: { globals: globals.browser } },
+  // Backend files (Node.js)
+  {
+    files: ["**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs", // Use CommonJS for backend
+      globals: {
+        ...globals.node, // Add Node.js globals
+      },
+    },
+    plugins: { js },
+    extends: ["js/recommended"],
+  },
 ]);
+
