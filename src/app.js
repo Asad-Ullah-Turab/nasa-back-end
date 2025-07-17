@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:8001",
+    origin: "http://localhost:3000",
   }),
 );
 
