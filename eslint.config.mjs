@@ -15,5 +15,13 @@ export default defineConfig([
     plugins: { js },
     extends: ["js/recommended"],
   },
+  // Jest test files
+  {
+    files: ["**/*.test.js", "**/__tests__/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+  },
 ]);
-
