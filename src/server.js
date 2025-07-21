@@ -2,7 +2,7 @@ const http = require("http");
 const mongoose = require("mongoose");
 
 const app = require("./app");
-const { loadHabitablePlanets } = require("./models/planets.model");
+const { loadHabitablePlanets } = require("./models/planets/planets.model");
 
 const PORT = process.env.PORT || 8000;
 const server = http.createServer(app);
