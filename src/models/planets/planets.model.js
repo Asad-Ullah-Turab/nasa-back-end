@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const planets = require("./planets.mongo");
 
 const { parse } = require("csv-parse");
 
@@ -25,21 +26,42 @@ function loadHabitablePlanets() {
           columns: true,
         }),
       )
-      .on("data", (data) => {
-        if (isHabitablePlanet(data)) habitablePlanets.push(data);
+      .on("data", async (data) => {
+        if (isHabitablePlanet(data)) {
+          await addPlanet(data);
+        }
       })
       .on("err", (err) => {
         console.log(err);
         reject();
       })
-      .on("end", () => {
-        console.log(`${habitablePlanets.length} habitable planets found`);
+      .on("end", async () => {
+        const planetsCount = (await getAllPlanets()).length;
+        console.log(`${planetsCount} habitable planets found`);
         resolve();
       });
   });
 }
 
+async function addPlanet(planet) {
+  await planets.updateOne(
+    {
+      keplerName: planet.kepler_name,
+    },
+    {
+      keplerName: planet.kepler_name,
+    },
+    {
+      upsert: true,
+    },
+  );
+}
+
+async function getAllPlanets() {
+  return planets.find({});
+}
+
 module.exports = {
-  planets: habitablePlanets,
+  getAllPlanets,
   loadHabitablePlanets,
 };

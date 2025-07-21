@@ -21,7 +21,7 @@ mongoose.connection.on("error", (err) => {
 });
 
 async function startServer() {
-  await mongoose.connect(MONGO_URL, {});
+  await mongoose.connect(MONGO_URL);
   await loadHabitablePlanets();
   server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}..`);

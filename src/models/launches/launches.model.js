@@ -1,4 +1,5 @@
 const launches = new Map();
+const launchesModelMongo = require("./launches.mongo");
 
 let latestFlightNumber = 100;
 const launch = {
@@ -29,7 +30,7 @@ function addNewLaunch(launch) {
     upcoming: true,
     success: true,
   });
-  launches.set(completeLaunch.flightNumber, completeLaunch);
+  launchesModelMongo.create(completeLaunch);
   return completeLaunch;
 }
 
