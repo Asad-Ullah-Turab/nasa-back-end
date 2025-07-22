@@ -5,11 +5,11 @@ const {
   existsLaunchWithId,
 } = require("../../models/launches/launches.model");
 
-function httpGetAllLaunches(req, res) {
-  return res.status(200).json(getAllLaunches());
+async function httpGetAllLaunches(req, res) {
+  return res.status(200).json(await getAllLaunches());
 }
 
-function httpAddNewLaunch(req, res) {
+async function httpAddNewLaunch(req, res) {
   const launch = req.body;
 
   if (
@@ -29,18 +29,19 @@ function httpAddNewLaunch(req, res) {
     });
   }
 
-  const result = addNewLaunch(launch);
+  const result = await addNewLaunch(launch);
   return res.status(201).json(result);
 }
 
-function httpAbortLaunch(req, res) {
+async function httpAbortLaunch(req, res) {
   const launchId = Number(req.params.id);
-  if (!existsLaunchWithId(launchId)) {
+  const launchExists = await existsLaunchWithId(launchId);
+  if (!launchExists) {
     return res.status(404).json({
       error: `Launch with ID: ${launchId} not found`,
     });
   }
-  const abortedLaunch = abortLaunch(launchId);
+  const abortedLaunch = await abortLaunch(launchId);
   return res.status(200).json(abortedLaunch);
 }
 

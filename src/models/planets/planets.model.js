@@ -4,8 +4,6 @@ const planets = require("./planets.mongo");
 
 const { parse } = require("csv-parse");
 
-const habitablePlanets = [];
-
 const isHabitablePlanet = (planet) => {
   return (
     planet["koi_disposition"] === "CONFIRMED" &&
