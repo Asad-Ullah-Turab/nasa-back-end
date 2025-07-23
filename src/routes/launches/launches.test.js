@@ -17,7 +17,7 @@ describe("Tests Launches API", () => {
 
   describe("Tests GET on /launches", () => {
     test("should return 200 status code", async () => {
-      await request(app).get("/launches").expect(200);
+      await request(app).get("/v1/launches").expect(200);
     });
   });
 
@@ -48,7 +48,7 @@ describe("Tests Launches API", () => {
 
     test("should return 201 status code", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send(completeLaunchData)
         .expect(201);
 
@@ -61,7 +61,7 @@ describe("Tests Launches API", () => {
 
     test("should return 400 status code when missing required properties", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send(launchDataWithoutDate)
         .expect(400);
       expect(response.body).toStrictEqual({
@@ -71,7 +71,7 @@ describe("Tests Launches API", () => {
 
     test("should return 400 status code when date is invalid", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send(launchDataWithInvalidDate)
         .expect(400);
       expect(response.body).toStrictEqual({
@@ -81,7 +81,7 @@ describe("Tests Launches API", () => {
 
     test("should return 400 status code when planet is invalid", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send(launchDataWithInvalidPlanet)
         .expect(400);
       expect(response.body).toStrictEqual({
