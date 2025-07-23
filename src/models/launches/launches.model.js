@@ -52,7 +52,24 @@ async function loadSpaceXLaunches() {
   }
 
   const launchDocs = response.data.docs;
-  console.log(launchDocs);
+
+  const launchesToSave = launchDocs.map((launchDoc) => {
+    return {
+      flightNumber: launchDoc.flight_number,
+      mission: launchDoc.name,
+      rocket: launchDoc.rocket.name,
+      launchDate: new Date(launchDoc.date_unix),
+      target: "Kepler-442 b",
+      customers: launchDoc.payloads.map((payload) => {
+        return payload.customers;
+      }),
+      upcoming: launchDoc.upcoming,
+      success: launchDoc.success,
+    };
+  });
+  launchesToSave.forEach((launch) => {
+    launch.customers = launch.customers.flat(2);
+  });
 }
 
 async function existsLaunchWithId(launchId) {
