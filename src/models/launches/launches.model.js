@@ -5,22 +5,47 @@ const axios = require("axios");
 const STARTING_FLIGHT_NUMBER = 100;
 const SPACEX_API_URL = "https://api.spacexdata.com/v4";
 
-const launch = {
-  flightNumber: 100, //flight_number
-  mission: "Kepler Exploration X", // name
-  rocket: "Explorer IS1", // rocket.name
-  launchDate: new Date("December 27, 2030"), // date_unix
-  target: "Kepler-442 b", // not applicable
-  customer: ["ZTM", "NASA"],
-  upcoming: true, // upcoming
-  success: true, // success
-};
+async function saveSpaceXLaunches(launchDocs) {
+  for (const launchDoc of launchDocs) {
+    const customers = launchDoc.payloads.flatMap(
+      (payload) => payload.customers,
+    );
+    const launch = {
+      flightNumber: launchDoc.flight_number,
+      mission: launchDoc.name,
+      rocket: launchDoc.rocket.name,
+      launchDate: new Date(launchDoc.date_unix),
+      target: "Kepler-442 b",
+      customers,
+      upcoming: launchDoc.upcoming,
+      success: launchDoc.success === null ? true : launchDoc.success,
+    };
+    await addNewLaunch(launch);
+  }
+  console.log(`${launchDocs.length} SpaceX launches saved successfully`);
+}
+
+async function existsLaunch(filter) {
+  return await launches.findOne(filter);
+}
+
+async function spaceXLaunchesExist() {
+  const firstLaunch = await existsLaunch({
+    flightNumber: 1,
+    mission: "FalconSat",
+  });
+  return firstLaunch !== null;
+}
 
 async function loadSpaceXLaunches() {
+  if (await spaceXLaunchesExist()) {
+    console.log("SpaceX launches already present in the database");
+    return;
+  }
   const response = await axios.post(`${SPACEX_API_URL}/launches/query`, {
     query: {},
     options: {
-      pagination: true,
+      pagination: false,
       select: {
         flight_number: 1,
         name: 1,
@@ -51,29 +76,11 @@ async function loadSpaceXLaunches() {
     throw new Error("Launch data download failed");
   }
 
-  const launchDocs = response.data.docs;
-
-  const launchesToSave = launchDocs.map((launchDoc) => {
-    return {
-      flightNumber: launchDoc.flight_number,
-      mission: launchDoc.name,
-      rocket: launchDoc.rocket.name,
-      launchDate: new Date(launchDoc.date_unix),
-      target: "Kepler-442 b",
-      customers: launchDoc.payloads.map((payload) => {
-        return payload.customers;
-      }),
-      upcoming: launchDoc.upcoming,
-      success: launchDoc.success,
-    };
-  });
-  launchesToSave.forEach((launch) => {
-    launch.customers = launch.customers.flat(2);
-  });
+  await saveSpaceXLaunches(response.data.docs);
 }
 
 async function existsLaunchWithId(launchId) {
-  const response = await launches.findOne({
+  const response = await existsLaunch({
     flightNumber: launchId,
   });
   return response;
@@ -85,6 +92,10 @@ async function getAllLaunches() {
 }
 
 async function addNewLaunch(launch) {
+  await launches.create(launch);
+}
+
+async function scheduleNewLaunch(launch) {
   const planet = await planets.findOne({
     keplerName: launch.target,
   });
@@ -93,7 +104,6 @@ async function addNewLaunch(launch) {
       "Planet name is incorrect. Only available planet names are allowed",
     );
   }
-
   let latestFlightNumber = await getLatestFlightNumber();
   const completeLaunch = Object.assign(launch, {
     flightNumber: ++latestFlightNumber,
@@ -101,7 +111,7 @@ async function addNewLaunch(launch) {
     upcoming: true,
     success: true,
   });
-  launches.create(completeLaunch);
+  await addNewLaunch(completeLaunch);
   return completeLaunch;
 }
 
@@ -134,6 +144,6 @@ module.exports = {
   loadSpaceXLaunches,
   existsLaunchWithId,
   getAllLaunches,
-  addNewLaunch,
+  scheduleNewLaunch,
   abortLaunch,
 };
