@@ -87,8 +87,7 @@ async function existsLaunchWithId(launchId) {
   return response;
 }
 
-async function getAllLaunches(query) {
-  const { limit, skip } = getPagination(query);
+async function getAllLaunches(skip, limit) {
   const response = await launches
     .find({}, "-__v -_id")
     .sort("flightNumber")
