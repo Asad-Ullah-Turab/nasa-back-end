@@ -1,6 +1,7 @@
 const launches = require("./launches.mongo");
 const planets = require("../planets/planets.mongo");
 const axios = require("axios");
+const getPagination = require("../../services/pagination");
 
 const STARTING_FLIGHT_NUMBER = 100;
 const SPACEX_API_URL = "https://api.spacexdata.com/v4";
@@ -86,8 +87,13 @@ async function existsLaunchWithId(launchId) {
   return response;
 }
 
-async function getAllLaunches() {
-  const response = await launches.find({}, "-__v -_id");
+async function getAllLaunches(query) {
+  const { limit, skip } = getPagination(query);
+  const response = await launches
+    .find({}, "-__v -_id")
+    .sort("flightNumber")
+    .skip(skip)
+    .limit(limit);
   return response;
 }
 
