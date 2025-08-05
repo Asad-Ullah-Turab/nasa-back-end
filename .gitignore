@@ -11,6 +11,9 @@ yarn-error.log*
 # Environment variables
 .env
 
+#SSL certificates
+ssl/
+
 # Build output
 dist/
 build/
