@@ -1,7 +1,6 @@
 const launches = require("./launches.mongo");
 const planets = require("../planets/planets.mongo");
 const axios = require("axios");
-const getPagination = require("../../services/pagination");
 
 const STARTING_FLIGHT_NUMBER = 100;
 const SPACEX_API_URL = "https://api.spacexdata.com/v4";
