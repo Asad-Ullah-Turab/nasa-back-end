@@ -15,6 +15,7 @@ app.use(
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "build")));
 app.use(morgan("combined"));
+
 app.use("/v1", apiV1);
 
 // Serve frontend
