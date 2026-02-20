@@ -5,11 +5,12 @@ const {
   httpAddNewLaunch,
   httpAbortLaunch,
 } = require("./launches.controller");
+const { checkLogin } = require("../../middlewares/checkLogin");
 
 const launchesRouter = express.Router();
 
 launchesRouter.get("/", httpGetAllLaunches);
-launchesRouter.post("/", httpAddNewLaunch);
+launchesRouter.post("/", checkLogin, httpAddNewLaunch);
 launchesRouter.delete("/:id", httpAbortLaunch);
 
 module.exports = launchesRouter;
