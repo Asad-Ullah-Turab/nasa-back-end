@@ -3,7 +3,8 @@ const cors = require("cors");
 const path = require("path");
 const morgan = require("morgan");
 const passport = require("passport");
-const cookieSession = require("cookie-session");
+const session = require("express-session");
+const { MongoStore } = require("connect-mongo");
 
 const apiV1 = require("./routes/apiV1");
 
@@ -19,11 +20,23 @@ app.use(
 );
 
 app.use(
-  cookieSession({
+  session({
     name: "session",
-    keys: [process.env.COOKIE_SECRET_KEY_01, process.env.COOKIE_SECRET_KEY_02],
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    secret: [
+      process.env.COOKIE_SECRET_KEY_01,
+      process.env.COOKIE_SECRET_KEY_02,
+    ],
+    resave: false, // Don't save session if unmodified
+    saveUninitialized: false, // Don't create session until something stored
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    },
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URL,
+      ttl: 24 * 60 * 60, // 1 day
+    }),
   }),
 );
 app.use(passport.initialize());
