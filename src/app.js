@@ -9,6 +9,15 @@ const apiV1 = require("./routes/apiV1");
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, "..", "build")));
+app.use(morgan("combined"));
+app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  }),
+);
+
 app.use(
   cookieSession({
     name: "session",
@@ -19,15 +28,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  }),
-);
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "build")));
-app.use(morgan("combined"));
 
 app.use("/", apiV1);
 

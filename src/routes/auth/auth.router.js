@@ -2,7 +2,7 @@ const express = require("express");
 const passport = require("passport");
 var googleStrategy = require("passport-google-oauth20").Strategy;
 
-// const { httpGoogleLogin } = require("./auth.controller");
+const { verifyLogin } = require("./auth.controller");
 
 passport.use(
   new googleStrategy(
@@ -11,12 +11,7 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "https://localhost:8000/auth/google/callback",
     },
-    function (accessToken, refreshToken, profile, cb) {
-      console.log("Access Token:", accessToken);
-      console.log("Refresh Token:", refreshToken);
-      console.log("Profile:", profile);
-      return cb(null, profile);
-    },
+    verifyLogin,
   ),
 );
 
@@ -29,11 +24,11 @@ passport.deserializeUser((id, done) => {
 });
 
 const authRouter = express.Router();
+
 authRouter.get(
   "/google",
   passport.authenticate("google", { scope: ["profile"] }),
 );
-
 authRouter.get(
   "/google/callback",
   passport.authenticate("google", {
